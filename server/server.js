@@ -47,5 +47,19 @@ app.put('/update-many', (req, res) => {
   }).catch(err => res.send(err))
 });
 
+app.put('/bulk-update', (req, res) => {
+  BucketListModel.find().then(buckets => {
+    (async () => {
+      const arr_of_bucket_promises = buckets.map((bucket, i) => {
+        const newBucket = bucket;
+        newBucket.name = `An activity ${i}`;
+        return BucketListModel.findByIdAndUpdate(bucket._id, newBucket)
+      })
+      const resolvedPromises = await Promise.all(arr_of_bucket_promises);
+      res.send(resolvedPromises);
+    })();
+  }).catch(err => res.send(err))
+});
+
 
 app.listen(3001, () => console.log('server running'));
